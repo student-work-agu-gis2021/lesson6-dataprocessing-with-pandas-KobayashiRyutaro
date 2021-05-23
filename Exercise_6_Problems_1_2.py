@@ -17,10 +17,10 @@ import numpy as np
 data = None
 
 # YOUR CODE HERE 1
-#create the file path
+#Create the file path
 fp = "data/1091402.txt"
 
-#read the file. Skip the second row. ('-9999') into 'Nan'.abs
+#Read the file. Skip the second row. ('-9999') into 'Nan'.abs
 data = pd.read_csv(fp, delim_whitespace = True, skiprows = [1], na_values = [-9999])
 
 print(data.head())
@@ -39,7 +39,7 @@ print(data.tail())
 tavg_nodata_count = None
 #YOUR CODE HERE 2
 
-
+#Whether the value exists or not
 trag_nodata_count = data['TAVG'].isnull().sum()
 
 
@@ -55,6 +55,7 @@ print('Number of no-data values in column "TAVG":',tavg_nodata_count)
 tmin_nodata_count = None
 #YOUR CODE HERE 3
 
+#Whether the value exists or not
 tmin_nodata_count = data['TMIN'].isnull().sum()
 
 
@@ -70,6 +71,8 @@ print('Number of no-data values in column "TMIN":', tmin_nodata_count)
 day_count = None 
 #YOUR CODE HERE 4
 
+
+#Checking the length of the dat
 day_count = len(data['DAY'])
 
 #CAUTION!!! DON'T EDIT THIS PART START
@@ -85,6 +88,8 @@ first_obs = None
  
 # YOUR CODE HERE 5
 
+
+#The first row of the column
 first_obs = data.loc[0,'DAY']
 
 #CAUTION!!! DON'T EDIT THIS PART START
@@ -99,6 +104,7 @@ last_obs = None
 
 # YOUR CODE HERE 6
 
+#The last row of the column
 last_obs = data.loc[day_count-1,'DAY']
 
 #CAUTION!!! DON'T EDIT THIS PART START
@@ -114,6 +120,8 @@ avg_temp = None
 
 # YOUR CODE HERE 7
 
+
+#Calculate the average of temperature
 avg_temp = data['TAVG'].mean()
 
 
@@ -130,7 +138,7 @@ avg_temp_1969 = None
 
 # YOUR CODE HERE 8
 
-
+#Calculate the average value of data that meets the following conditions
 avg_temp_1969 = data['TMAX'].loc[(data['DAY'] >= 19690501) & (data['DAY'] < 19690901)].mean()
 
 
@@ -147,33 +155,41 @@ monthly_data = None
 
 # YOUR CODE HERE 9
 
+#Define a function to convert units and convert the data.
 def fahr_to_celsius(temp_fahrenheit):
   converted_temp = (temp_fahrenheit - 32)/1.8
   return converted_temp
 
-
 data['TAVG'] = data['TAVG'].apply(fahr_to_celsius)
 
 
+#Create monthly_data
 monthly_data = pd.DataFrame()
 
-
+#Change the data type to a string type. Getting the month
 data['TIME_STR'] = data['d'].astype(str)
 data['YEAR'] = data['TIME_STR'].str.slice(start = 0, stop = 4)
 data['MONTH'] = data['TIME_STR'].str.slice(start = 4, stop = 6)
 
+
+#Grouping by year and month
 grouped = data.groupby(['YEAR','MONTH'])
 
 
 mean_col = ['TAVG']
 
 
+
+
+#Calculate the average value of "TAVG" for all groups and add it to monthly_data
 for key, group in grouped:
   mean_values = group[mean_col].mean()
   monthly_data = monthly_data.append(mean_values, ignore_index = True)
 
 
 
+
+#To change the column name. Create a dictionary
 new_name = {'TAVG':'temp_celsius'}
 monthly_data = monthly_data.rename(columns = new_name)
 
